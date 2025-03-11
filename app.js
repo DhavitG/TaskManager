@@ -6,13 +6,10 @@ const connectDB = require("./db/connect");
 require("dotenv").config();
 
 // Middlewares
+app.use(express.static("./public"));
 app.use(express.json());
 
 // Routes
-app.get("/hello", function (req, res) {
-  res.send("Task manager application");
-});
-
 app.use("/api/v1/tasks", tasks);
 
 const port = 5002;
