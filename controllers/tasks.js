@@ -6,11 +6,18 @@ const getAllTasks = (req, res) => {
 
 const createTask = async (req, res) => {
   const { name, completed } = req.body;
-  const task = await Task.create({
-    name,
-    completed,
-  });
-  res.status(201).json({ task });
+
+  try {
+    const task = await Task.create({
+      name,
+      completed,
+    });
+    res.status(201).json({ task });
+  } catch (e) {
+    return res.status(500).json({
+      message: e.message,
+    });
+  }
 };
 
 const getTask = (req, res) => {
