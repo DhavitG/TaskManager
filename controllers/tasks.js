@@ -1,5 +1,6 @@
 const Task = require("../models/Task");
 const asyncWrapper = require("../middlewares/asyncWrapper");
+const { createCustomError, CustomAPIError } = require("../errors/custom-error");
 
 const getAllTasks = asyncWrapper(async (req, res) => {
   const tasks = await Task.find({});
@@ -12,15 +13,15 @@ const createTask = asyncWrapper(async (req, res) => {
 });
 
 //keeping this outside the wrapper cause it needs to be understood better (the wrapper)
-const getTask = async (req, res) => {
+const getTask = async (req, res, next) => {
   try {
     const taskID = req.params.id;
     const task = await Task.findOne({ _id: taskID });
 
     if (!task) {
-      return res
-        .status(404)
-        .json({ message: `Task with id ${taskID} doesn't exist. ` });
+      return next(
+        createCustomError(`Task with id ${taskID} doesn't exist. `, 404)
+      );
     }
     res.status(200).json({ task });
   } catch (e) {
@@ -39,9 +40,9 @@ const updateTask = asyncWrapper(async (req, res) => {
   });
 
   if (!task) {
-    return res
-      .status(404)
-      .json({ message: `Task with id ${taskID} doesn't exist. ` });
+    return next(
+      createCustomError(`Task with id ${taskID} doesn't exist. `, 404)
+    );
   }
 
   res.status(200).json({ task });
@@ -52,9 +53,9 @@ const deleteTask = asyncWrapper(async (req, res) => {
   const task = await Task.findOneAndDelete({ _id: taskID });
 
   if (!task) {
-    return res
-      .status(404)
-      .json({ message: `Task with id ${taskID} doesn't exist. ` });
+    return next(
+      createCustomError(`Task with id ${taskID} doesn't exist. `, 404)
+    );
   }
 
   res.status(200).json({ task });
